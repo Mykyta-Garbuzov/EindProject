@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-    web:
+    website:
         labels:
           dev.okteto.com/private: "true"
         build: .
@@ -9,7 +9,6 @@ services:
         volumes:
             - sqlite_volume:/eindproject/sqlitedb
         environment: 
-            PORT: 8000
             FLASK_DEBUG: 1
 volumes:
   sqlite_volume:
