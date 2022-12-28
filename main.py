@@ -39,20 +39,8 @@ def read_current_user(username: str = Depends(get_current_username)):
     return {"username": username}
 
 
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://127.0.0.1:8000"
 
-]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -64,7 +52,7 @@ def validation_exception_handler(request, err):
     return JSONResponse(status_code=400, content={"message": f"{base_error_message}. Detail: {err}"})
 
 
-@app.get('/dogs', tags=["Item"],response_model=List[schemas.Item])
+@app.get('/dogs', tags=["Item"],response_model=List[schemas.Item],)
 def get_all_items(name: Optional[str] = None,db: Session = Depends(get_db)):
     """
     Get all the Items stored in database
