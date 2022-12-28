@@ -1,8 +1,6 @@
 version: "3.9"
 services:
     api:
-        labels:
-          dev.okteto.com/private: "true"
         build: .
         ports:
             - "8000:8000"
