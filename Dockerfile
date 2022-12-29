@@ -6,6 +6,7 @@ RUN python -m pip install --upgrade pip
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 RUN mkdir -p /eindproject/sqlitedb
+RUN pip install python-multipart
 
 
 COPY . .

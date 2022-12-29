@@ -1,7 +1,7 @@
 import uvicorn
 import sql_app.models as models
 import sql_app.schemas as schemas
-
+import auth 
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -11,8 +11,7 @@ from sql_app.repositories import ItemRepo
 from sqlalchemy.orm import Session
 from typing import List,Optional
 from fastapi.encoders import jsonable_encoder
-
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 
 
@@ -24,18 +23,39 @@ app = FastAPI(title="FastAPI Application",
 
 security = HTTPBasic()
 
-def grant_access(credentials: HTTPBasicCredentials = Depends(security)):
-    if not (credentials.username == "admin@msite.com") or not (credentials.password == "mykyta"):
-            raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username 
-
-
 
 models.Base.metadata.create_all(bind=engine)
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+@app.post("/token")
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = auth.authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = auth.create_access_token(
+        data={"sub": user.email}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@app.post("/owners/", response_model=schemas.User)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = ItemRepo.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return ItemRepo.create_user(db=db, user=user)
+
+@app.get("/owners/", response_model=list[schemas.User])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    users = ItemRepo.get_users(db, skip=skip, limit=limit)
+    return users
 
 #Meld over een fout 
 @app.exception_handler(Exception)
@@ -45,7 +65,7 @@ def validation_exception_handler(request, err):
 
 
 @app.get('/dogs', tags=["Item"],response_model=List[schemas.Item],)
-def get_all_items(name: Optional[str] = None,dogs: str = Depends(grant_access),db: Session = Depends(get_db)):
+def get_all_items(name: Optional[str] = None,db: Session = Depends(get_db)):
     """
     Get all the Items stored in database
     """
@@ -59,7 +79,7 @@ def get_all_items(name: Optional[str] = None,dogs: str = Depends(grant_access),d
 
 
 @app.get('/dogs/{item_id}', tags=["Item"],response_model=schemas.Item)
-def get_item(item_id: int and str = Depends(grant_access),db: Session = Depends(get_db)):
+def get_item(item_id: int ,db: Session = Depends(get_db)):
     """
     Get the Item with the given ID provided by User stored in database
     """
@@ -69,7 +89,7 @@ def get_item(item_id: int and str = Depends(grant_access),db: Session = Depends(
     return db_item
 
 @app.delete('/dogs/{item_id}', tags=["Item"])
-async def delete_item(item_id: int and str = Depends(grant_access),db: Session = Depends(get_db)):
+async def delete_item(item_id: int,db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Delete the Item with the given ID provided by User stored in database
     """
@@ -80,7 +100,7 @@ async def delete_item(item_id: int and str = Depends(grant_access),db: Session =
     return "Item deleted successfully!"
 
 @app.put('/dogs/{item_id}', tags=["Item"],response_model=schemas.Item)
-async def update_item(item_id: int ,item_request: schemas.Item and str = Depends(grant_access), db: Session = Depends(get_db)):
+async def update_item(item_id: int ,item_request: schemas.Item , db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Update an Item stored in the database
     """
@@ -97,7 +117,7 @@ async def update_item(item_id: int ,item_request: schemas.Item and str = Depends
     
 #Meld 
 @app.post('/dogs', tags=["Item"],response_model=schemas.Item,status_code=201)
-async def create_item(item_request: schemas.ItemCreate and str = Depends(grant_access), db: Session = Depends(get_db)):
+async def create_item(item_request: schemas.ItemCreate , db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     """
     Create an Item and store it in the database
     """
