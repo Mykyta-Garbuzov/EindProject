@@ -2,8 +2,8 @@ import uvicorn
 import sql_app.models as models
 import sql_app.schemas as schemas
 import auth 
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import HTTPBasic
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from sql_app import models
 from db import get_db, engine
@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from typing import List,Optional
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
@@ -23,6 +24,16 @@ app = FastAPI(title="FastAPI Application",
 
 security = HTTPBasic()
 
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 models.Base.metadata.create_all(bind=engine)
 
