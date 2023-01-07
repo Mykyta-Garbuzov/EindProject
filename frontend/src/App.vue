@@ -16,7 +16,7 @@ export default {
   },
   methods: {
     getPosts() {
-      fetch('http://127.0.0.1:8000/dogs')
+      fetch('https://api-mykyta-garbuzov.cloud.okteto.net/dogs')
       
         .then(response => response.json())
         .then(data => this.post = data)
