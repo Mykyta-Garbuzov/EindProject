@@ -8,8 +8,6 @@ import router from './router';
 const app = createApp(App);
 
 axios.defaults.withCredentials = true;
-// axios.defaults.baseURL = 'http://localhost:8000/';  // the FastAPI backend
-
 axios.defaults.baseURL = 'https://api-mykyta-garbuzov.cloud.okteto.net/docs'
 
 app.use(router);
