@@ -16,5 +16,5 @@ scrape_configs:
     dns_sd_configs:
       - names: ["app"]
         port: 8000
-         type: A
-         refresh_interval: 5s
+        type: A
+        refresh_interval: 5s
