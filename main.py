@@ -17,7 +17,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 
 app = FastAPI(title="FastAPI Application",
-    description=" FastAPI Application with Swagger and Sqlite",
+    description=" FastAPI Application with Sqlite, Grafana, Prometheus",
     version="1.0.0",)
 
 security = HTTPBasic()
@@ -52,7 +52,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-
 @app.post("/owners/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = ItemRepo.get_user_by_email(db, email=user.email)
@@ -82,16 +81,6 @@ def get_all_items(name: Optional[str] = None,db: Session = Depends(get_db)):
         return dogs
     else:
         return ItemRepo.fetch_all(db)
-
-@app.get('/dogs/{item_id}', tags=["Item"],response_model=schemas.Item)
-def get_item(item_id: int ,db: Session = Depends(get_db)):
-    """
-    Get the Item with the given ID provided by User stored in database
-    """
-    db_item = ItemRepo.fetch_by_id(db,item_id)
-    if db_item is None:
-        raise HTTPException(status_code=404, detail="Item not found with the given ID")
-    return db_item
 
 @app.delete('/dogs/{item_id}', tags=["Item"])
 async def delete_item(item_id: int,db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
