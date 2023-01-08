@@ -5,16 +5,10 @@ from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
-
-
-
-
-
 class ItemRepo:
-    
+    #For dogs
  async def create(db: Session, item: schemas.ItemCreate):
-        db_item = models.Item(name=item.name,sort=item.sort,description=item.description,id=item.id,owner_id=item.owner_id)
+        db_item = models.Item(name=item.name,sort=item.sort,description=item.description,id=item.id,owner_id=item.owner_id,store_id=item.store_id)
         db.add(db_item)
         db.commit()
         db.refresh(db_item)
@@ -34,7 +28,6 @@ class ItemRepo:
      db.delete(db_item)
      db.commit()
      
-     
  async def update(db: Session,item_data):
     updated_item = db.merge(item_data)
     db.commit()
@@ -42,7 +35,7 @@ class ItemRepo:
  def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
-
+# for users
  def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
  
@@ -70,5 +63,30 @@ class ItemRepo:
     db.refresh(db_item)
     return db_item
 
+class StoreRepo:
+    async def create(db: Session, store: schemas.StoreCreate):
+            db_store = models.Store(name=store.name)
+            db.add(db_store)
+            db.commit()
+            db.refresh(db_store)
+            return db_store
+        
+    def fetch_by_id(db: Session,_id:int):
+        return db.query(models.Store).filter(models.Store.id == _id).first()
+    
+    def fetch_by_name(db: Session,name:str):
+        return db.query(models.Store).filter(models.Store.name == name).first()
+    
+    def fetch_all(db: Session, skip: int = 0, limit: int = 100):
+        return db.query(models.Store).offset(skip).limit(limit).all()
+    
+    async def delete(db: Session,_id:int):
+        db_store= db.query(models.Store).filter_by(id=_id).first()
+        db.delete(db_store)
+        db.commit()
+        
+    async def update(db: Session,store_data):
+        db.merge(store_data)
+        db.commit()
 
 

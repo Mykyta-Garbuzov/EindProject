@@ -9,6 +9,7 @@ class ItemBase(BaseModel):
     description: Optional[str] = None
     id: int
     owner_id: int
+    store_id: int
 
 
 
@@ -34,6 +35,19 @@ class User(UserBase):
     id: int
     is_active: bool
     items: list[Item] = []
+
+    class Config:
+        orm_mode = True
+
+class StoreBase(BaseModel):
+    name: str
+
+class StoreCreate(StoreBase):
+    pass
+
+class Store(StoreBase):
+    id: int
+    items: List[Item] = []
 
     class Config:
         orm_mode = True

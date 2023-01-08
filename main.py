@@ -7,15 +7,13 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from sql_app import models
 from db import get_db, engine
-from sql_app.repositories import ItemRepo
+from sql_app.repositories import ItemRepo, StoreRepo
 from sqlalchemy.orm import Session
 from typing import List,Optional
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
-
-
-
+from prometheus_fastapi_instrumentator import Instrumentator
 
 
 app = FastAPI(title="FastAPI Application",
@@ -23,9 +21,6 @@ app = FastAPI(title="FastAPI Application",
     version="1.0.0",)
 
 security = HTTPBasic()
-
-
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,7 +31,9 @@ app.add_middleware(
 )
 
 models.Base.metadata.create_all(bind=engine)
-
+@app.on_event("startup")
+async def startup():
+    Instrumentator().instrument(app).expose(app)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -68,12 +65,10 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), t
     users = ItemRepo.get_users(db, skip=skip, limit=limit)
     return users
 
-#Meld over een fout 
 @app.exception_handler(Exception)
 def validation_exception_handler(request, err):
     base_error_message = f"Failed to execute: {request.method}: {request.url}"
     return JSONResponse(status_code=400, content={"message": f"{base_error_message}. Detail: {err}"})
-
 
 @app.get('/dogs', tags=["Item"],response_model=List[schemas.Item],)
 def get_all_items(name: Optional[str] = None,db: Session = Depends(get_db)):
@@ -87,7 +82,6 @@ def get_all_items(name: Optional[str] = None,db: Session = Depends(get_db)):
         return dogs
     else:
         return ItemRepo.fetch_all(db)
-
 
 @app.get('/dogs/{item_id}', tags=["Item"],response_model=schemas.Item)
 def get_item(item_id: int ,db: Session = Depends(get_db)):
@@ -126,9 +120,8 @@ async def update_item(item_id: int ,item_request: schemas.Item , db: Session = D
     else:
         raise HTTPException(status_code=400, detail="Item not found with the given ID")
     
-#Meld 
 @app.post('/dogs', tags=["Item"],response_model=schemas.Item,status_code=201)
-async def create_item(item_request: schemas.ItemCreate , db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def create_item(item_request: schemas.ItemCreate , db: Session = Depends(get_db)):
     """
     Create an Item and store it in the database
     """
@@ -138,6 +131,34 @@ async def create_item(item_request: schemas.ItemCreate , db: Session = Depends(g
         raise HTTPException(status_code=400, detail="Item already exists!")
 
     return await ItemRepo.create(db=db, item=item_request)
+
+@app.post('/stores', tags=["Store"],response_model=schemas.Store,status_code=201)
+async def create_store(store_request: schemas.StoreCreate, db: Session = Depends(get_db)):
+    """
+    Create a Store and save it in the database
+    """
+    db_store = StoreRepo.fetch_by_name(db, name=store_request.name)
+    print(db_store)
+    if db_store:
+        raise HTTPException(status_code=400, detail="Store already exists!")
+
+    return await StoreRepo.create(db=db, store=store_request)
+
+@app.get('/stores', tags=["Store"],response_model=List[schemas.Store])
+def get_all_stores(name: Optional[str] = None,db: Session = Depends(get_db)):
+    """
+    Get all the Stores stored in database
+    """
+    if name:
+        stores =[]
+        db_store = StoreRepo.fetch_by_name(db,name)
+        print(db_store)
+        stores.append(db_store)
+        return stores
+    else:
+        return StoreRepo.fetch_all(db)
+
+    
 
 if __name__ == "__main__":
     uvicorn.run("main:app", port=8000, reload=True,log_level="info")
