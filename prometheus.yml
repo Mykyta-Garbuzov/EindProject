@@ -14,9 +14,9 @@ scrape_configs:
 
   - job_name: "app"
     static_configs:
-      - targets: ["https://app-mykyta-garbuzov.cloud.okteto.net/metrics"]
-    dns_sd_configs:
-      - names: ["app"]
-        port: 8000
-        type: A
-        refresh_interval: 5s
+      - targets: ["https://app-mykyta-garbuzov.cloud.okteto.net"]
+    # dns_sd_configs:
+    #   - names: ["app"]
+    #     port: 8000
+    #     type: A
+    #     refresh_interval: 5s
