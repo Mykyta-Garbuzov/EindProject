@@ -11,25 +11,19 @@ class ItemBase(BaseModel):
     owner_id: int
     store_id: int
 
-
-
 class ItemCreate(ItemBase):
     pass
-
 
 class Item(ItemBase):
     id: int
 
     class Config:
         orm_mode = True
-
 class UserBase(BaseModel):
     email: str
 
-
 class UserCreate(UserBase):
     password: str
-
 
 class User(UserBase):
     id: int

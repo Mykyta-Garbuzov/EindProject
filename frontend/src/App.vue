@@ -24,10 +24,13 @@
 
 <div class="col-3">
   <section >
-    <form  @submit.prevent="setPost">
+    <form @submit.prevent="setPost" >
+      <div>
         <label for="name">Name : </label>
         <input type="text" id="name" v-model="postData.name">
-      <button type="button" class="btn btn-dark ">Create Post</button>
+      </div>
+      
+      <button type="button" class="btn btn-dark " >Create Post</button>
     </form>
   </section>
 </div>
@@ -43,7 +46,9 @@ export default {
       post: {},
       owners: {},
       postData: {
-        name: ""
+        name: "",
+        id: "",
+        items: ""
       },
       store:{}
     }
@@ -64,7 +69,12 @@ export default {
         .then(data => this.store = data)
     },
     getOwners() {
-      fetch('https://app-mykyta-garbuzov.cloud.okteto.net/owners')
+      fetch('https://app-mykyta-garbuzov.cloud.okteto.net/owners/',{
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer 93876439bdee6d3dab4e9d75cc73eed82b580067eb2555a062273ff0c8650b2e'
+        },
+      })
       
         .then(response => response.json())
         .then(data => this.owners = data)
@@ -73,7 +83,9 @@ export default {
       fetch('https://app-mykyta-garbuzov.cloud.okteto.net/stores',{
         method:  'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer 93876439bdee6d3dab4e9d75cc73eed82b580067eb2555a062273ff0c8650b2e'
+         
         },
         body: JSON.stringify({
           name: this.name
@@ -83,6 +95,6 @@ export default {
         .then(data => console.log(data))
     }
   }
-};
+}
 
 </script>
