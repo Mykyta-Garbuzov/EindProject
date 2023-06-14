@@ -88,7 +88,7 @@ Mijn front-end wordt gehost op netlify. Er zijn alleen pare files dat ik moet to
  ![image](https://user-images.githubusercontent.com/71609618/211378945-29ad72db-2b98-49ad-acc4-4677dbaafaa2.png)
 
 ## Vue
-Voor vue.js moeten we node.js installeren en het is eerste ding dat ik moest doen. Na installatie zijn van vue.js zullen we zien dat er veel nieuwe files zijn verschenen maar in de werkelijkheid zullen we alleen werken met index.html en App. Vue
+Voor vue.js moeten we node.js installeren en het is eerste ding dat ik moest doen. Na installatie van vue.js zullen we zien dat er veel nieuwe files zijn verschenen maar in de werkelijkheid zullen we alleen werken met index.html en App. Vue
 
 ![image](https://user-images.githubusercontent.com/71609618/211378955-5d96d4e3-fb57-44b4-947f-fd519e6057b7.png)
 
