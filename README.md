@@ -94,7 +94,7 @@ Voor vue.js moeten we node.js installeren en het is eerste ding dat ik moest doe
 
  
 ### Index.html
-In index.html gebruiken we basis html en bootstraap voor de stijl.  Het bekent dat we geen fetch api daar zullen gebruiken. Er is alleen een div met id=”app” die template van App. Vue zal nemen en voor ons op html zal plakken.
+In index.html gebruiken we basis html en bootstraap voor de stijl.  Het betekent dat we geen fetch api daar zullen gebruiken. Er is alleen een div met id=”app” die template van App. Vue zal nemen en voor ons op html zal plakken.
 ![image](https://user-images.githubusercontent.com/71609618/211378992-23678a96-bcc8-477f-a995-1014c0c856ad.png)
 
  
@@ -108,7 +108,7 @@ Verder kunnen we zien hoe de gegevens worden aangevraagd via Post en Get . Helaa
 
 # Grafan&Prometheus
 Ik heb gewone Grafana gebruikt vanuit het internet omdat Grafana Cloud free trail zou vervallen na 14 dagen en dan zou ik 8 euro per maand moeten betalen. Als een alternatief besloot ik Grafana installeren met Prometheus want ik heb er meer van geleerd hoe zij allebei werken en hoe zij moeten aangepast worden voor mijn eigen eisen.
-Voor Grafana heb ik extra Prometheus geïnstalleerd. Prometheus verzamelt de gegevens vanuit ons API en Grafana maakt een dashboards ervan. We hebben al in docker-compose gezien hoe zij met elkaar zijn verbonden maar er zijn nog pare files die we moesten toevoegen zodat het zou werken. 
+Voor Grafana heb ik extra Prometheus geïnstalleerd. Prometheus verzamelt de gegevens vanuit onze API en Grafana maakt een dashboards ervan. We hebben al in docker-compose gezien hoe zij met elkaar zijn verbonden maar er zijn nog pare files die we moesten toevoegen zodat het zou werken. 
 Prometheus.yml
 ### Hier vermelden we van welke plaatsen we de logsgegevens willen verzamelen en we kunnen zien dat we de gegevens nemen van onze app en Prometheus zelf.
   ![image](https://user-images.githubusercontent.com/71609618/211379071-56d3e7f9-ee6e-4209-af50-f4282d968377.png)
